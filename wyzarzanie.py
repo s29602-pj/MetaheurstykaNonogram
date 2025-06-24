@@ -2,14 +2,14 @@ import math
 import time
 import random
 import copy
-from funkcjaCelu import porownaj_siatki
+from Cel import funkcja_celu
 from funkcjaCelu import generuj_sasiedztwo
 
-def algorytm_symulowanego_wyzarzania(siatka_start, siatka_wzor,
+def algorytm_symulowanego_wyzarzania(siatka_start, wiersze, kolumny,
                                       T_start=100.0, T_koniec=0.1, alfa=0.95):
     start_time = time.time()
     aktualna = copy.deepcopy(siatka_start)
-    blad_aktualny = porownaj_siatki(aktualna, siatka_wzor)
+    blad_aktualny = funkcja_celu(aktualna, wiersze, kolumny)
     najlepsza = copy.deepcopy(aktualna)
     blad_najlepszy = blad_aktualny
 
@@ -20,7 +20,7 @@ def algorytm_symulowanego_wyzarzania(siatka_start, siatka_wzor,
         iteracja += 1
         sasiedzi = generuj_sasiedztwo(aktualna)
         kandydat = random.choice(sasiedzi)
-        blad_kandydata = porownaj_siatki(kandydat, siatka_wzor)
+        blad_kandydata = funkcja_celu(kandydat, wiersze, kolumny)
 
         delta = blad_kandydata - blad_aktualny
 

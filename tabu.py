@@ -1,16 +1,18 @@
 import time
 import copy
-from funkcjaCelu import porownaj_siatki
+
 from funkcjaCelu import generuj_sasiedztwo
+from Cel import funkcja_celu
 
 
 
 
-def algorytm_tabu(siatka_start, siatka_wzor, max_iteracje=None):
+def algorytm_tabu(siatka_start, wiersze, kolumny, max_iteracje=None, tabu_size=50):
+
     start_time = time.time()
     aktualna = copy.deepcopy(siatka_start)
     najlepsza = copy.deepcopy(aktualna)
-    blad_najlepszy = porownaj_siatki(najlepsza, siatka_wzor)
+    blad_najlepszy = funkcja_celu(najlepsza, wiersze, kolumny)
     tabu = [copy.deepcopy(aktualna)]
     historia = [copy.deepcopy(aktualna)]
 
@@ -29,12 +31,17 @@ def algorytm_tabu(siatka_start, siatka_wzor, max_iteracje=None):
             else:
                 break
 
-        najlepszy_kandydat = min(sasiedzi_dopuszczalni, key=lambda s: porownaj_siatki(s, siatka_wzor))
-        blad_kandydata = porownaj_siatki(najlepszy_kandydat, siatka_wzor)
+        najlepszy_kandydat = min(
+            sasiedzi_dopuszczalni,
+            key=lambda s: funkcja_celu(s, wiersze, kolumny)
+        )
+        blad_kandydata = funkcja_celu(najlepszy_kandydat, wiersze, kolumny)
 
         aktualna = najlepszy_kandydat
         historia.append(copy.deepcopy(aktualna))
         tabu.append(copy.deepcopy(aktualna))
+        if len(tabu) > tabu_size:
+            tabu.pop(0)
 
         if blad_kandydata < blad_najlepszy:
             najlepsza = copy.deepcopy(najlepszy_kandydat)
@@ -42,7 +49,6 @@ def algorytm_tabu(siatka_start, siatka_wzor, max_iteracje=None):
 
         if blad_najlepszy == 0:
             break
-
 
         if max_iteracje is not None and iteracja >= max_iteracje:
             print("Zatrzymano algorytm po osiągnięciu limitu iteracji.")

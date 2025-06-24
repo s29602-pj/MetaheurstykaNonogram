@@ -4,13 +4,12 @@ import copy
 import random
 
 
-from funkcjaCelu import porownaj_siatki
+
 from funkcjaCelu import generuj_sasiedztwo
 from Cel import funkcja_celu
 
+def pelny_przeglad(wysokosc, szerokosc, wiersze, kolumny):
 
-#Pelen przeglad
-def pelny_przeglad(wysokosc, szerokosc, siatka_wzor):
     start_time = time.time()
     licznik = 0
 
@@ -22,13 +21,13 @@ def pelny_przeglad(wysokosc, szerokosc, siatka_wzor):
             for y in range(wysokosc)
         ]
 
-        bledy = porownaj_siatki(siatka, siatka_wzor)
+        bledy = funkcja_celu(siatka, wiersze, kolumny)
 
         if bledy == 0:
             czas = time.time() - start_time
-            print(f"\n Znaleziono idealne rozwiązanie w próbie nr {licznik}")
-            print(f" Czas przeszukiwania: {czas:.4f} sekundy")
-            return siatka, 0
+            return siatka, bledy, czas, licznik
+
+
 
 
 

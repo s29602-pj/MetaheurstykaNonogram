@@ -1,14 +1,14 @@
 import copy
 import random
 
-
-def porownaj_siatki(s1, s2):
-    bledy = 0
-    for y in range(len(s1)):
-        for x in range(len(s1[0])):
-            if s1[y][x] != s2[y][x]:
-                bledy += 1
-    return bledy
+#
+# def porownaj_siatki(s1, s2):
+#     bledy = 0
+#     for y in range(len(s1)):
+#         for x in range(len(s1[0])):
+#             if s1[y][x] != s2[y][x]:
+#                 bledy += 1
+#     return bledy
 
 
 #Stara wersja:

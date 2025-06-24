@@ -1,11 +1,10 @@
 import sys
 from podstawaNono import parsuj
-from podstawaNono import rozwiaz
 from podstawaNono import drukuj_siatke
 
 from funkcjaCelu import generuj_sasiedztwo
 from funkcjaCelu import generuj_losowa_siatke
-from funkcjaCelu import porownaj_siatki
+
 
 from algorytmy import pelny_przeglad
 from algorytmy import klasyczna_wspinaczka
@@ -14,6 +13,9 @@ from algorytmy import losowa_wspinaczka
 from wyzarzanie import algorytm_symulowanego_wyzarzania
 
 from porowanie import  porownaj_metody
+
+from Cel import  funkcja_celu
+
 
 from tabu import algorytm_tabu
 from zbieznosc import generuj_wykres_zbieznosci
@@ -52,32 +54,30 @@ def main():
     wiersze = parsuj(wiersze_raw)
 
     siatka = [[0] * szerokosc for _ in range(wysokosc)]
-    rozwiaz(wiersze, kolumny, siatka)
-    print("Rozwiązanie początkowe (idealne):")
-    drukuj_siatke(siatka)
-
-    siatka_wzor = [wiersz.copy() for wiersz in siatka]
     siatka_start = generuj_losowa_siatke(wysokosc, szerokosc)
 
 #Losowanie
     print("\nLosowa siatka:")
     siatka_losowa = generuj_losowa_siatke(wysokosc, szerokosc)
     drukuj_siatke(siatka_losowa)
-    roznica = porownaj_siatki(siatka_losowa, siatka_wzor)
-    print(f"Różnica względem wzorca: {roznica} pól")
+    roznica = funkcja_celu(siatka_losowa, wiersze, kolumny)
+    print(f"Błędy w wierszach i kolumnach: {roznica}")
 
 
-#Najlepszy sasiad zmiana
+# Najlepszy sasiad zmiana
     print("\nNajlepsze sąsiedztwo:")
-    sasiedztwa = generuj_sasiedztwo(siatka)
-    najlepszego_sasiedztwa = min(sasiedztwa, key=lambda s: porownaj_siatki(s, siatka_wzor))
+    sasiedztwa = generuj_sasiedztwo(siatka_losowa)
+    najlepszego_sasiedztwa = min(sasiedztwa, key=lambda s: funkcja_celu(s, wiersze, kolumny))
     drukuj_siatke(najlepszego_sasiedztwa)
-    print(f"Różnica względem wzorca: {porownaj_siatki(najlepszego_sasiedztwa, siatka_wzor)} pól")
+    print(f"Błędy w wierszach i kolumnach: {funkcja_celu(najlepszego_sasiedztwa, wiersze, kolumny)}")
 
 #Pelen przeglad
-    najlepsza, bledy = pelny_przeglad(wysokosc, szerokosc, siatka_wzor)
+    print("\nPełny przegląd:")
+    najlepsza, bledy, czas, iteracje = pelny_przeglad(wysokosc, szerokosc, wiersze, kolumny)
     drukuj_siatke(najlepsza)
-    print(f"Różnica względem wzorca: {bledy} pól")
+    print(f"Czas przeszukiwania: {czas:.4f} sekundy")
+    print(f"Liczba iteracji: {iteracje}")
+    print(f"Błędy w wierszach i kolumnach: {bledy}")
 
 #Klasyczny polegajacy na prrawidlowej funkcji celu która Pan zatwierdził
     print("\nKlasyczny wspinaczkowy (funkcja_celu_dzialajaca):")
@@ -93,26 +93,29 @@ def main():
 
 #Algorytm tabu z cofnieciem
     wynik_tabu, blad_tabu, iteracje_tabu, czas_tabu, historia = algorytm_tabu(
-        siatka_start, siatka_wzor, max_iteracje=1000
+        siatka_start, wiersze, kolumny, max_iteracje=1000, tabu_size=30
     )
+
     print("Tabu (bez ograniczeń):")
     drukuj_siatke(wynik_tabu)
-    print(f"Błędy: {blad_tabu}, Iteracje: {iteracje_tabu}, Czas: {czas_tabu:.4f}s")
+    print(f"Błędy w wierszach i kolumnach: {blad_tabu}, Iteracje: {iteracje_tabu}, Czas: {czas_tabu:.4f}s")
 
     if len(historia) > 1:
         print("\nCofnięcie o 1 krok:")
         drukuj_siatke(historia[-2])
+        print(f"Błędy w wierszach i kolumnach: {funkcja_celu(historia[-2], wiersze, kolumny)}")
 
 
 
 
 #Algorytm wyzarzania
     wynik_sa, blad_sa, iteracje_sa, czas_sa = algorytm_symulowanego_wyzarzania(
-        siatka_start, siatka_wzor, T_start=100.0, T_koniec=0.1, alfa=0.95)
+        siatka_start, wiersze, kolumny, T_start=100.0, T_koniec=0.1, alfa=0.95
+    )
 
     print("Symulowane wyżarzanie:")
     drukuj_siatke(wynik_sa)
-    print(f"Błędy: {blad_sa}, Iteracje: {iteracje_sa}, Czas: {czas_sa:.4f}s")
+    print(f"Błędy w wierszach i kolumnach: {blad_sa}, Iteracje: {iteracje_sa}, Czas: {czas_sa:.4f}s")
 
 
 
